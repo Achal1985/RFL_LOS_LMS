@@ -1,5 +1,6 @@
 import json
 import re
+import os
 import secrets
 import sqlite3
 from datetime import date, datetime, timedelta
@@ -10,8 +11,8 @@ from urllib.parse import parse_qs, urlparse
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "nbfc_los.db"
-HOST = "127.0.0.1"
-PORT = 8000
+HOST = "0.0.0.0"
+PORT = int(os.environ.get("PORT", 8000))
 
 WORKFLOW_STAGES = [
     "Lead Generation",
