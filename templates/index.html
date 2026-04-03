@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RFL Loan Sanction Workflow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="/static/religare-logo.jpg" alt="Religare" class="brand-logo-sidebar">
+      </div>
+      <nav class="nav-group">
+        <button class="nav-item active" data-view="pipeline" type="button">Pipeline</button>
+        <button class="nav-item" data-view="applications" type="button">Applications</button>
+        <button class="nav-item" data-view="verification" type="button">Verification Hub</button>
+        <button class="nav-item" data-view="credit" type="button">Credit Desk</button>
+        <button class="nav-item" data-view="disbursement" type="button">Disbursement</button>
+        <button class="nav-item" data-route="/lms" type="button">Loan Management System</button>
+      </nav>
+      <section class="sidebar-card">
+        <p class="card-label">Today</p>
+        <h2 id="today-disbursal">₹0</h2>
+        <p class="muted">Projected disbursal volume</p>
+        <div class="mini-stat-row"><span>Approval Rate</span><strong id="approval-rate">0%</strong></div>
+        <div class="mini-stat-row"><span>Cases in Motion</span><strong id="active-cases">0</strong></div>
+      </section>
+      <section class="sidebar-card accent">
+        <p class="card-label">Underwriter Queue</p>
+        <div id="uw-queue" class="queue-list"></div>
+      </section>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div>
+          <h2>Lead to Disbursal Workflow</h2>
+        </div>
+        <div class="topbar-actions">
+          <div class="header-business-date">
+            <span class="card-label">Business Date</span>
+            <span id="los-business-date" class="status-pill">--</span>
+          </div>
+          <button class="ghost-btn" type="button" onclick="window.location.href='/logout'">Logout</button>
+          <button class="ghost-btn" id="open-lms-btn" type="button">Open LMS</button>
+          <button class="ghost-btn" id="export-mis-btn" type="button">Export MIS</button>
+        </div>
+      </header>
+
+      <section class="hero-grid app-view active" data-view-panel="pipeline">
+        <div class="hero-card">
+          <div class="hero-header">
+            <div>
+              <p class="card-label">Portfolio Pulse</p>
+              <h3>Operational Control Board</h3>
+            </div>
+            <span class="status-pill live">Live</span>
+          </div>
+          <div class="metrics-grid" id="metrics-grid"></div>
+        </div>
+        <div class="hero-card glass">
+          <div class="hero-header">
+            <div>
+              <p class="card-label">SLA Radar</p>
+              <h3>Workflow bottlenecks</h3>
+            </div>
+          </div>
+          <div class="sla-list" id="sla-list"></div>
+        </div>
+      </section>
+
+      <section class="workspace-grid intake-grid app-view active" data-view-panel="pipeline">
+        <article class="workspace-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Lead Generation</p>
+              <h3>Rapid Intake Desk</h3>
+            </div>
+            <span class="status-pill live">New Business</span>
+          </div>
+          <form id="lead-form" class="lead-form">
+            <label><span>Applicant Name</span><input type="text" name="applicant" placeholder="Enter customer or business name" required></label>
+            <label><span>Product</span><select name="product"><option>Business Loan</option><option>Loan Against Property</option><option>SME Secured Loan</option><option>SME Unsecured Loan</option></select></label>
+            <label><span>Loan Amount</span><input type="number" name="amount" min="50000" step="10000" value="250000" required></label>
+            <label><span>City</span><input type="text" name="city" placeholder="Enter city" required></label>
+            <label><span>Source</span><select name="source"><option>Digital Campaign</option><option>DSA Partner</option><option>Branch Walk-in</option><option>Referral</option></select></label>
+            <label><span>Tenor (months)</span><input type="number" name="tenor" min="6" max="60" value="24" required></label>
+            <button class="primary-btn" type="submit">Create Lead</button>
+          </form>
+        </article>
+        <aside class="workspace-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Stage Controls</p>
+              <h3>Workflow Gates</h3>
+            </div>
+          </div>
+          <div id="workflow-gates" class="decision-stack"></div>
+        </aside>
+      </section>
+
+      <section class="board-section app-view active" data-view-panel="pipeline">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Origination Board</p>
+            <h3>Workflow Tracker</h3>
+          </div>
+          <div class="filter-chip">Region: Pan India</div>
+        </div>
+        <div class="pipeline-board" id="pipeline-board"></div>
+      </section>
+
+      <section class="workspace-grid app-view active" data-view-panel="pipeline">
+        <article class="workspace-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Demo Journey</p>
+              <h3>Step by Step LOS Workflow</h3>
+            </div>
+            <span id="demo-stage-pill" class="status-pill live">Stage Guide</span>
+          </div>
+          <div id="demo-actions" class="topbar-actions"></div>
+          <div id="journey-guide" class="journey-guide"></div>
+        </article>
+        <aside class="workspace-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Current Demo Step</p>
+              <h3>What Happens Next</h3>
+            </div>
+          </div>
+          <div id="step-detail" class="documents-list"></div>
+        </aside>
+      </section>
+
+      <section class="workspace-grid app-view active" data-view-panel="pipeline">
+        <article class="workspace-card" id="customer-details-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Customer Details</p>
+              <h3>Required Applicant Profile Form</h3>
+            </div>
+            <span class="status-pill" id="profile-form-status">Pending</span>
+          </div>
+          <form id="customer-profile-form" class="lead-form">
+            <label><span>Mobile Number</span><input type="text" name="mobile" required></label>
+            <label><span>Email</span><input type="email" name="email"></label>
+            <label><span>UCIC Number</span><input type="text" name="ucic_number" readonly></label>
+            <label><span>Aadhaar Number</span><input type="text" name="aadhaar_number" required></label>
+            <label><span>GST Number</span><input type="text" name="gst_number" required></label>
+            <label><span>Full Address</span><input type="text" name="address" required></label>
+            <label><span>Occupation</span><input type="text" name="occupation" required></label>
+            <label><span>Monthly Income</span><input type="number" name="monthly_income" min="0"></label>
+            <label><span>Business Name</span><input type="text" name="business_name"></label>
+            <label><span>Business Vintage</span><input type="text" name="business_vintage"></label>
+            <label><span>Bank Name</span><input type="text" name="bank_name" required></label>
+            <label><span>Account Number</span><input type="text" name="account_number"></label>
+            <label><span>IFSC Code</span><input type="text" name="ifsc"></label>
+            <label><span>Co-Applicant Name</span><input type="text" name="co_applicant_name" required></label>
+            <label><span>Co-Applicant Mobile</span><input type="text" name="co_applicant_mobile"></label>
+            <label><span>Co-Applicant Relation</span><select name="co_applicant_relation"><option>Spouse</option><option>Father</option><option>Mother</option><option>Brother</option><option>Sister</option><option>Partner</option></select></label>
+            <label><span>Guarantor Name</span><input type="text" name="guarantor_name" required></label>
+            <label><span>Guarantor Mobile</span><input type="text" name="guarantor_mobile"></label>
+            <label><span>Guarantor Relation</span><select name="guarantor_relation"><option>Friend</option><option>Relative</option><option>Business Associate</option><option>Partner</option></select></label>
+            <label><span>Collateral Type</span><input type="text" name="collateral_type" required></label>
+            <label><span>Collateral Address</span><input type="text" name="collateral_address" required></label>
+            <label><span>Collateral Value</span><input type="number" name="collateral_value" min="1"></label>
+            <label style="grid-column: 1 / -1;"><span>Notepad Entry</span><input type="text" name="notepad_entry" required></label>
+            <button class="primary-btn" type="submit">Save Details and Move to KYC</button>
+          </form>
+        </article>
+        <aside class="workspace-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">System Guidance</p>
+              <h3>What You Must Complete</h3>
+            </div>
+          </div>
+          <div id="profile-guidance" class="documents-list"></div>
+        </aside>
+      </section>
+
+      <section class="workspace-grid app-view active" data-view-panel="pipeline">
+        <article class="workspace-card customer-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Application Workspace</p>
+              <h3 id="customer-name">Select a case</h3>
+            </div>
+            <span id="customer-stage" class="status-pill">Stage</span>
+          </div>
+          <div class="profile-summary" id="profile-summary"></div>
+          <div class="detail-tabs">
+            <button class="tab active" data-tab="journey" type="button">Journey</button>
+            <button class="tab" data-tab="risk" type="button">Risk</button>
+            <button class="tab" data-tab="documents" type="button">Documents</button>
+            <button class="tab" data-tab="repayment" type="button">Repayment</button>
+          </div>
+          <div class="tab-panel active" id="tab-journey"><div class="journey-timeline" id="journey-timeline"></div></div>
+          <div class="tab-panel" id="tab-risk"><div class="risk-grid" id="risk-grid"></div></div>
+          <div class="tab-panel" id="tab-documents"><div id="documents-list" class="documents-list"></div></div>
+          <div class="tab-panel" id="tab-repayment">
+            <div class="repayment-overview" id="repayment-overview"></div>
+            <div class="schedule-table-wrap">
+              <table class="schedule-table">
+                <thead><tr><th>EMI</th><th>Due Date</th><th>Opening Balance</th><th>EMI Amount</th><th>ROI</th><th>Principal</th><th>Interest</th><th>Closing</th></tr></thead>
+                <tbody id="repayment-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+        <aside class="workspace-card action-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Decision Engine</p>
+              <h3>Eligibility & Controls</h3>
+            </div>
+          </div>
+          <div class="score-ring-wrap">
+            <div class="score-ring"><span id="eligibility-score">0</span></div>
+            <div><p class="card-label">Composite Score</p><p id="eligibility-text" class="muted">Waiting for case selection</p></div>
+          </div>
+          <div class="decision-stack" id="decision-stack"></div>
+          <div class="cta-stack">
+            <button class="primary-btn full" id="approve-btn" type="button">Approve & Generate Docs</button>
+            <button class="ghost-btn full" id="hold-btn" type="button">Put on Hold</button>
+          </div>
+        </aside>
+      </section>
+
+      <section class="app-view" data-view-panel="applications">
+        <div class="workspace-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Applications</p>
+              <h3>Case Registry</h3>
+            </div>
+            <span class="status-pill live">Live Casebook</span>
+          </div>
+          <div class="table-wrap">
+            <table class="schedule-table">
+              <thead>
+                <tr>
+                  <th>Case ID</th>
+                  <th>Applicant</th>
+                  <th>Product</th>
+                  <th>Amount</th>
+                  <th>Stage</th>
+                  <th>Compliance</th>
+                  <th>Eligibility</th>
+                  <th>Owner</th>
+                </tr>
+              </thead>
+              <tbody id="applications-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="app-view" data-view-panel="verification">
+        <div class="workspace-grid">
+          <article class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Verification Hub</p>
+                <h3>KYC, Aadhaar, Dedupe, Field Checks</h3>
+              </div>
+            </div>
+            <div id="verification-grid" class="risk-grid"></div>
+          </article>
+          <aside class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Flow Diagram</p>
+                <h3>Verification to Decision Path</h3>
+              </div>
+            </div>
+            <div id="flow-diagram" class="flow-diagram"></div>
+          </aside>
+        </div>
+        <div class="workspace-grid">
+          <article class="workspace-card hidden" id="stage-form-card-verification">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Verification Form</p>
+                <h3 id="stage-form-title-verification">Stage Form</h3>
+              </div>
+              <span class="status-pill" id="stage-form-status-verification">Required</span>
+            </div>
+            <p id="stage-form-helper-verification" class="muted"></p>
+            <form id="stage-form-verification" class="lead-form"></form>
+          </article>
+          <aside class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Guidance</p>
+                <h3>Required Checks</h3>
+              </div>
+            </div>
+            <div id="stage-guidance-verification" class="documents-list"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="app-view" data-view-panel="credit">
+        <div class="workspace-grid">
+          <article class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Credit Desk</p>
+                <h3>Underwriting and Bureau Desk</h3>
+              </div>
+            </div>
+            <div id="credit-grid" class="decision-stack"></div>
+          </article>
+          <aside class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Decision Summary</p>
+                <h3>Policy and Exceptions</h3>
+              </div>
+            </div>
+            <div id="credit-summary" class="documents-list"></div>
+          </aside>
+        </div>
+        <div class="workspace-grid">
+          <article class="workspace-card hidden" id="stage-form-card-credit">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Credit Form</p>
+                <h3 id="stage-form-title-credit">Stage Form</h3>
+              </div>
+              <span class="status-pill" id="stage-form-status-credit">Required</span>
+            </div>
+            <p id="stage-form-helper-credit" class="muted"></p>
+            <form id="stage-form-credit" class="lead-form"></form>
+          </article>
+          <aside class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Guidance</p>
+                <h3>Decision Inputs</h3>
+              </div>
+            </div>
+            <div id="stage-guidance-credit" class="documents-list"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="app-view" data-view-panel="disbursement">
+        <div class="workspace-grid">
+          <article class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Disbursement</p>
+                <h3>Ready Cases, Docs and E-Sign</h3>
+              </div>
+            </div>
+            <div id="disbursement-grid" class="documents-list"></div>
+          </article>
+          <aside class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Execution Checklist</p>
+                <h3>Final Fulfilment Controls</h3>
+              </div>
+            </div>
+            <div id="disbursement-checklist" class="decision-stack"></div>
+          </aside>
+        </div>
+        <div class="workspace-grid">
+          <article class="workspace-card hidden" id="stage-form-card-disbursement">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Fulfilment Form</p>
+                <h3 id="stage-form-title-disbursement">Stage Form</h3>
+              </div>
+              <span class="status-pill" id="stage-form-status-disbursement">Required</span>
+            </div>
+            <p id="stage-form-helper-disbursement" class="muted"></p>
+            <form id="stage-form-disbursement" class="lead-form"></form>
+          </article>
+          <aside class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Guidance</p>
+                <h3>Fulfilment Controls</h3>
+              </div>
+            </div>
+            <div id="stage-guidance-disbursement" class="documents-list"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="app-view" data-view-panel="lms">
+        <div class="workspace-grid">
+          <article class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Loan Management System</p>
+                <h3>LMS Command Center</h3>
+              </div>
+            </div>
+            <div id="lms-overview" class="documents-list"></div>
+          </article>
+          <aside class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Statement of Account</p>
+                <h3>Post Disbursal Ledger</h3>
+              </div>
+            </div>
+            <div class="schedule-table-wrap">
+              <table class="schedule-table">
+                <thead><tr><th>EMI</th><th>Due Date</th><th>EMI Amount</th><th>Principal</th><th>Interest</th><th>Status</th></tr></thead>
+                <tbody id="lms-statement-table"></tbody>
+              </table>
+            </div>
+          </aside>
+        </div>
+        <div class="workspace-grid">
+          <article class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Case Viewer</p>
+                <h3>Loan Case Snapshot</h3>
+              </div>
+            </div>
+            <div id="lms-case-viewer" class="documents-list"></div>
+          </article>
+          <aside class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">LMS Actions</p>
+                <h3>Post Disbursal Changes</h3>
+              </div>
+            </div>
+            <div id="lms-action-log" class="documents-list"></div>
+          </aside>
+        </div>
+        <div class="workspace-grid">
+          <article class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Advanced LMS Modules</p>
+                <h3>Servicing, Collections and Charge Controls</h3>
+              </div>
+            </div>
+            <div id="lms-menu" class="lms-menu"></div>
+          </article>
+          <aside class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Module Workspace</p>
+                <h3 id="lms-module-title">Select LMS Function</h3>
+              </div>
+            </div>
+            <div id="lms-module-summary" class="documents-list"></div>
+            <form id="lms-module-form" class="lead-form hidden"></form>
+            <div id="lms-reports" class="documents-list"></div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="modal-overlay hidden" id="disbursal-success-modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="section-heading tight">
+        <div>
+          <p class="eyebrow">Disbursal Completed</p>
+          <h3 id="disbursal-success-title">Application successfully disbursed</h3>
+        </div>
+        <button class="ghost-btn" id="close-disbursal-modal" type="button">Close</button>
+      </div>
+      <div id="disbursal-success-body" class="documents-list"></div>
+      <div class="topbar-actions">
+        <button class="ghost-btn" id="modal-download-repayment" type="button">Download Complete Repayment</button>
+        <button class="ghost-btn" id="modal-download-sanction" type="button">Download Sanction Letter</button>
+        <button class="primary-btn" id="modal-download-esign" type="button">Download E-Sign Agreement</button>
+        <button class="primary-btn" id="modal-open-lms" type="button">Open LMS</button>
+      </div>
+    </div>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

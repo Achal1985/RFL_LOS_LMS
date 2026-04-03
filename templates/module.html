@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RFL Platform Modules</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="module-page">
+  <div class="module-shell">
+    <aside class="module-sidebar">
+      <div class="brand">
+        <img src="/static/religare-logo.jpg" alt="Religare" class="brand-logo-sidebar">
+      </div>
+      <div class="module-side-card">
+        <p class="card-label">Platform Console</p>
+        <h2>Enterprise Module Hub</h2>
+        <p class="muted">Launch LOS, LMS, Loan Masters and SSO Admin from one secure control layer.</p>
+      </div>
+      <nav class="module-side-nav">
+        <button class="lms-side-link active" type="button" data-module-tab="launcher">Module Launcher</button>
+        <button class="lms-side-link" type="button" data-module-tab="masters">Loan Masters</button>
+        <button class="lms-side-link" type="button" data-module-tab="sso">SSO Admin</button>
+      </nav>
+      <div class="lms-side-actions">
+        <button class="ghost-btn full" type="button" onclick="window.location.href='/'">Open LOS</button>
+        <button class="ghost-btn full" type="button" onclick="window.location.href='/lms'">Open LMS</button>
+        <button class="ghost-btn full" type="button" onclick="window.location.href='/logout'">Logout</button>
+      </div>
+    </aside>
+
+    <main class="module-main">
+      <header class="module-topbar">
+        <div>
+          <p class="eyebrow">Platform Modules</p>
+          <h1>Module Control Center</h1>
+        </div>
+        <div class="topbar-actions">
+          <div class="header-business-date">
+            <span class="card-label">Business Date</span>
+            <span id="module-business-date" class="status-pill">--</span>
+          </div>
+          <span id="module-current-user" class="status-pill live">--</span>
+        </div>
+      </header>
+
+      <section class="module-view active" data-module-view="launcher">
+        <section class="module-launch-grid">
+          <article class="module-launch-card glass-card" data-launch-target="/">
+            <p class="card-label">1. Loan Sanction Workflow</p>
+            <h3>LOS Command Workspace</h3>
+            <p class="muted">Lead generation, compliance capture, verification, underwriting, fulfilment and disbursal controls.</p>
+            <button class="primary-btn" type="button">Open LOS</button>
+          </article>
+          <article class="module-launch-card glass-card" data-launch-target="/lms">
+            <p class="card-label">2. Loan Management System</p>
+            <h3>LMS Servicing Workspace</h3>
+            <p class="muted">Statements, collections, EOD/BOD, accounting vouchers, foreclosure, reschedule and recovery operations.</p>
+            <button class="primary-btn" type="button">Open LMS</button>
+          </article>
+          <article class="module-launch-card glass-card" data-launch-target="masters">
+            <p class="card-label">3. Loan Masters</p>
+            <h3>Master Maintenance Workspace</h3>
+            <p class="muted">Create, modify and add all product, branch, user, rule engine and generic key-value masters.</p>
+            <button class="primary-btn" type="button">Open Masters</button>
+          </article>
+          <article class="module-launch-card glass-card" data-launch-target="sso">
+            <p class="card-label">4. SSO Admin</p>
+            <h3>Identity And Access Control</h3>
+            <p class="muted">User access snapshot, role mapping and module access administration for enterprise operations.</p>
+            <button class="primary-btn" type="button">Open SSO Admin</button>
+          </article>
+        </section>
+      </section>
+
+      <section class="module-view" data-module-view="masters">
+        <section class="workspace-grid">
+          <article class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Loan Masters</p>
+                <h3>Master Categories</h3>
+              </div>
+              <span class="status-pill live">Editable</span>
+            </div>
+            <div id="master-category-grid" class="module-master-grid"></div>
+          </article>
+          <article class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Master Workspace</p>
+                <h3 id="master-workspace-title">Select Master</h3>
+              </div>
+              <div class="topbar-actions">
+                <button class="ghost-btn" id="master-add-row" type="button">Add Row</button>
+                <button class="ghost-btn" id="master-checker" type="button">Approve As Checker</button>
+                <button class="primary-btn" id="master-save" type="button">Save As Maker</button>
+              </div>
+            </div>
+            <div id="master-audit-banner" class="documents-list"></div>
+            <div class="table-wrap">
+              <table class="schedule-table master-table">
+                <thead id="master-headings"></thead>
+                <tbody id="master-rows"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <section class="module-view" data-module-view="sso">
+        <section class="workspace-grid">
+          <article class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">SSO Admin</p>
+                <h3>Identity Snapshot</h3>
+              </div>
+            </div>
+            <div id="sso-summary" class="documents-list"></div>
+          </article>
+          <article class="workspace-card">
+            <div class="section-heading tight">
+              <div>
+                <p class="eyebrow">Module Access</p>
+                <h3>Role And Access Matrix</h3>
+              </div>
+            </div>
+            <div id="sso-access-grid" class="module-master-grid"></div>
+          </article>
+        </section>
+      </section>
+    </main>
+  </div>
+  <script src="/static/module.js"></script>
+</body>
+</html>

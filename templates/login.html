@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RFL Loan Sanction Workflow Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="login-shell">
+    <div class="login-scene">
+      <div class="scene-glow glow-one"></div>
+      <div class="scene-glow glow-two"></div>
+      <div class="scene-grid"></div>
+
+      <section class="login-showcase">
+        <div class="showcase-stack">
+          <div class="showcase-card showcase-primary">
+            <div class="showcase-orb orb-a"></div>
+            <div class="showcase-orb orb-b"></div>
+            <div class="showcase-orb orb-c"></div>
+            <div class="showcase-copy">
+              <p class="eyebrow">Religare Digital Finance Layer</p>
+              <h2>Decision-ready workflow for lead to disbursal &amp; Loan Servicing</h2>
+              <p class="muted">A premium control surface for origination, verification, underwriting, fulfilment, collections and lifecycle loan servicing.</p>
+            </div>
+            <div class="showcase-floating-grid">
+              <div class="showcase-floating-card depth-one">
+                <span>LOS</span>
+                <strong>Originations</strong>
+                <p>Lead onboarding, KYC, bureau and sanction workflow.</p>
+              </div>
+              <div class="showcase-floating-card depth-two">
+                <span>LMS</span>
+                <strong>Servicing</strong>
+                <p>SOA, collections, charges, reschedule and foreclosure control.</p>
+              </div>
+              <div class="showcase-floating-card depth-three">
+                <span>Secure</span>
+                <strong>2FA Access</strong>
+                <p>Captcha and OTP-protected enterprise-grade access journey.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="login-card">
+        <div class="brand login-brand">
+          <img src="/static/religare-logo.jpg" alt="Religare" class="brand-logo-login">
+        </div>
+
+        <div class="workspace-card login-panel-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Sign In</p>
+              <h3>Access Secure Workspace</h3>
+            </div>
+            <span class="status-pill live">2FA Enabled</span>
+          </div>
+
+          <form method="post" action="/login" class="lead-form login-form login-advanced-form">
+            <input type="hidden" name="challenge_id" value="{{ challenge_id }}">
+
+            <div class="login-credential-grid">
+              <label>
+                <span>User ID</span>
+                <input type="text" name="user_id" autocomplete="username" required>
+              </label>
+
+              <label>
+                <span>Password</span>
+                <input type="password" name="password" autocomplete="current-password" required>
+              </label>
+            </div>
+
+            <div class="login-security-grid">
+              <div class="login-step-card">
+                <div class="login-step-head">
+                  <strong>Captcha Verification</strong>
+                  <span class="status-pill">Required</span>
+                </div>
+                <div class="captcha-row">
+                  <div class="captcha-box" id="captcha-box">{{ captcha_code }}</div>
+                  <label class="captcha-input">
+                    <span>Enter Captcha</span>
+                    <input type="text" name="captcha_input" id="captcha-input" maxlength="5" required>
+                  </label>
+                </div>
+              </div>
+
+              <div class="login-step-card">
+                <div class="login-step-head">
+                  <strong>2 Factor Authentication</strong>
+                  <span class="status-pill">OTP</span>
+                </div>
+                <div class="otp-row">
+                  <button class="ghost-btn" type="button" id="send-otp-btn">Send OTP</button>
+                  <span id="otp-status" class="muted">Use registered mobile / email for verification.</span>
+                </div>
+                <label>
+                  <span>Enter OTP</span>
+                  <input type="password" name="otp" id="otp-input" inputmode="numeric" maxlength="6" required>
+                </label>
+              </div>
+            </div>
+
+            <button class="primary-btn" type="submit">Secure Login</button>
+          </form>
+
+          <div id="login-error" class="documents-list hidden">
+            <div class="document-item policy-item bad">
+              <div>
+                <strong>Login Failed</strong>
+                <p id="login-error-text" class="muted">Enter valid credentials and complete security checks to continue.</p>
+              </div>
+              <span class="status-pill">Retry</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const errorCode = "{{ error_code }}";
+    const loginError = document.getElementById("login-error");
+    const loginErrorText = document.getElementById("login-error-text");
+    const sendOtpBtn = document.getElementById("send-otp-btn");
+    const otpStatus = document.getElementById("otp-status");
+    const otpInput = document.getElementById("otp-input");
+
+    if (sendOtpBtn) {
+      sendOtpBtn.addEventListener("click", () => {
+        otpStatus.textContent = "OTP sent successfully. Please enter the OTP to continue.";
+        otpInput.focus();
+      });
+    }
+
+    if (errorCode) {
+      loginError.classList.remove("hidden");
+      if (errorCode === "2") {
+        loginErrorText.textContent = "Login challenge expired. Please try again.";
+      } else if (errorCode === "3") {
+        loginErrorText.textContent = "Captcha verification failed. Please enter the correct captcha.";
+      } else {
+        loginErrorText.textContent = "User ID, password or OTP is invalid. Please try again.";
+      }
+    }
+  </script>
+</body>
+</html>

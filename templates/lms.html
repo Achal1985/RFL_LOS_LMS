@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RFL Loan Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="lms-page">
+  <div class="lms-shell">
+    <aside class="lms-sidebar">
+      <div class="brand">
+        <img src="/static/religare-logo.jpg" alt="Religare" class="brand-logo-sidebar">
+      </div>
+      <div class="lms-side-card">
+        <p class="card-label">Loan Management System</p>
+        <h2>Loan Management System</h2>
+        <p class="muted">Servicing, collections, charges, reports, and daily batch controls.</p>
+      </div>
+      <nav class="lms-side-nav">
+        <button class="lms-side-link active" type="button" data-lms-jump="overview">Overview</button>
+        <button class="lms-side-link" type="button" data-lms-jump="statement">Statement of Account</button>
+        <button class="lms-side-link" type="button" data-lms-jump="modules">Advanced LMS Modules</button>
+        <button class="lms-side-link" type="button" data-lms-jump="workspace">Module Workspace</button>
+        <button class="lms-side-link" type="button" data-lms-jump="reports">LMS Reports</button>
+      </nav>
+      <div class="lms-side-actions">
+        <button class="ghost-btn full" type="button" onclick="window.location.href='/'">Back to LOS</button>
+        <button class="ghost-btn full" type="button" onclick="window.location.href='/logout'">Logout</button>
+      </div>
+    </aside>
+
+    <main class="lms-main">
+      <header class="lms-topbar">
+        <div>
+          <p class="eyebrow">Loan Management System</p>
+          <h1>Loan Management System</h1>
+        </div>
+        <div class="topbar-actions">
+          <div class="header-business-date">
+            <span class="card-label">Business Date</span>
+            <span id="lms-business-date" class="status-pill">--</span>
+          </div>
+          <span id="lms-case-pill" class="status-pill">No case selected</span>
+        </div>
+      </header>
+
+      <section class="workspace-card lms-search-shell">
+        <div class="section-heading tight">
+          <div>
+            <p class="eyebrow">Common LMS Lookup</p>
+            <h3>Search Any Disbursed Loan</h3>
+          </div>
+          <span id="lms-search-status" class="status-pill">Search Required</span>
+        </div>
+        <div class="lms-search-grid">
+          <label class="lms-search-field">
+            <span>Application ID / LOS ID / Agreement No / Customer ID</span>
+            <input id="lms-search-input" type="text" placeholder="Enter RFL-xxxxxx, AGR-xxxxxx, CUST-xxxxx or customer name">
+          </label>
+          <div class="lms-search-actions">
+            <button class="primary-btn" id="lms-search-btn" type="button">Search Account</button>
+            <button class="ghost-btn" id="lms-clear-btn" type="button">Clear</button>
+          </div>
+        </div>
+        <div id="lms-search-results" class="documents-list"></div>
+      </section>
+
+      <section class="lms-grid-top" id="overview-section">
+        <article class="workspace-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Loan Management System</p>
+              <h3>Loan Management System</h3>
+            </div>
+          </div>
+          <div id="lms-overview" class="documents-list"></div>
+        </article>
+        <article class="workspace-card" id="statement-section">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Statement of Account</p>
+              <h3>Post Disbursal Ledger</h3>
+            </div>
+          </div>
+          <div class="schedule-table-wrap">
+            <table class="schedule-table">
+              <thead><tr><th>EMI</th><th>Due Date</th><th>EMI Amount</th><th>Principal</th><th>Interest</th><th>Status</th></tr></thead>
+              <tbody id="lms-statement-table"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="lms-grid-mid">
+        <article class="workspace-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Case Viewer</p>
+              <h3>Loan Case Snapshot</h3>
+            </div>
+          </div>
+          <div id="lms-case-viewer" class="documents-list"></div>
+        </article>
+        <article class="workspace-card">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Recent LMS Actions</p>
+              <h3>Servicing Activity Log</h3>
+            </div>
+          </div>
+          <div id="lms-action-log" class="documents-list"></div>
+        </article>
+      </section>
+
+      <section class="lms-grid-bottom">
+        <article class="workspace-card" id="modules-section">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Advanced LMS Modules</p>
+              <h3>Servicing, Collections and Charge Controls</h3>
+            </div>
+          </div>
+          <div id="lms-menu" class="lms-menu"></div>
+        </article>
+        <article class="workspace-card" id="workspace-section">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Module Workspace</p>
+              <h3 id="lms-module-title">Select LMS Function</h3>
+            </div>
+          </div>
+          <div id="lms-module-summary" class="documents-list"></div>
+          <form id="lms-module-form" class="lead-form hidden"></form>
+          <div id="lms-reports" class="documents-list"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+  <script src="/static/lms.js"></script>
+</body>
+</html>
