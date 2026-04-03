@@ -425,12 +425,48 @@ function validateProfilePayload(payload) {
   const errors = [];
   if (!/^[6-9]\d{9}$/.test(digitsOnly(payload.mobile))) errors.push("Mobile number should be a valid 10 digit number.");
   if (!/^\d{12}$/.test(digitsOnly(payload.aadhaar_number))) errors.push("Aadhaar number should be a valid 12 digit number.");
-  if (!/^[A-Z0-9]{10,15}$/.test(String(payload.ucic_number || "").trim().toUpperCase())) errors.push("UCIC number is required.");
   if (!/^\d{2}[A-Z]{5}[0-9]{4}[A-Z][A-Z0-9]Z[A-Z0-9]$/.test(String(payload.gst_number || "").trim().toUpperCase())) errors.push("GST number is invalid.");
   if (payload.co_applicant_mobile && !/^[6-9]\d{9}$/.test(digitsOnly(payload.co_applicant_mobile))) errors.push("Co-applicant mobile should be a valid 10 digit number.");
   if (payload.guarantor_mobile && !/^[6-9]\d{9}$/.test(digitsOnly(payload.guarantor_mobile))) errors.push("Guarantor mobile should be a valid 10 digit number.");
   if (!(Number(payload.collateral_value) > 0)) errors.push("Collateral value should be greater than zero.");
   return errors;
+}
+
+function formToObject(form) {
+  return Object.fromEntries(new FormData(form).entries());
+}
+
+function getDraftKey(scope, caseId = "new", stage = "") {
+  return `rfl-draft:${scope}:${caseId}:${stage}`;
+}
+
+function saveDraft(scope, form, caseId = "new", stage = "") {
+  if (!form) return;
+  try {
+    localStorage.setItem(getDraftKey(scope, caseId, stage), JSON.stringify(formToObject(form)));
+  } catch (_) {}
+}
+
+function loadDraft(scope, caseId = "new", stage = "") {
+  try {
+    return JSON.parse(localStorage.getItem(getDraftKey(scope, caseId, stage)) || "{}");
+  } catch (_) {
+    return {};
+  }
+}
+
+function clearDraft(scope, caseId = "new", stage = "") {
+  try {
+    localStorage.removeItem(getDraftKey(scope, caseId, stage));
+  } catch (_) {}
+}
+
+function bindDraftAutoSave(form, scope, caseId = "new", stage = "") {
+  if (!form || form.dataset.draftBound === "true") return;
+  const handler = () => saveDraft(scope, form, caseId, stage);
+  form.addEventListener("input", handler);
+  form.addEventListener("change", handler);
+  form.dataset.draftBound = "true";
 }
 
 async function api(path, options = {}) {
@@ -481,6 +517,8 @@ function activateTab(tabName) {
 
 function fillProfileForm(profile = {}) {
   if (!el.customerProfileForm) return;
+  const draft = loadDraft("customer-profile", state.selectedCaseId || "new");
+  const mergedProfile = { ...profile, ...draft, ucic_number: profile.ucic_number || draft.ucic_number || "" };
   [
     "mobile", "email", "ucic_number", "aadhaar_number", "gst_number", "address", "occupation", "monthly_income",
     "business_name", "business_vintage", "bank_name", "account_number", "ifsc",
@@ -489,8 +527,9 @@ function fillProfileForm(profile = {}) {
     "collateral_type", "collateral_address", "collateral_value", "notepad_entry"
   ].forEach((field) => {
     const input = el.customerProfileForm.elements[field];
-    if (input) input.value = profile[field] || "";
+    if (input) input.value = mergedProfile[field] || "";
   });
+  bindDraftAutoSave(el.customerProfileForm, "customer-profile", state.selectedCaseId || "new");
 }
 
 function renderStageFormArea(item) {
@@ -515,7 +554,10 @@ function renderStageFormArea(item) {
   stageNameMap[10] = "document_collection";
   stageNameMap[11] = "esign";
   stageNameMap[12] = "disbursement";
-  const stored = item.stage_data?.[stageNameMap[item.stage]] || {};
+  const stored = {
+    ...(item.stage_data?.[stageNameMap[item.stage]] || {}),
+    ...loadDraft("stage-form", item.id, item.stage)
+  };
   const targetForm = isVerification ? el.stageFormVerification : isCredit ? el.stageFormCredit : el.stageFormDisbursement;
   const targetTitle = isVerification ? el.stageFormTitleVerification : isCredit ? el.stageFormTitleCredit : el.stageFormTitleDisbursement;
   const targetStatus = isVerification ? el.stageFormStatusVerification : isCredit ? el.stageFormStatusCredit : el.stageFormStatusDisbursement;
@@ -527,6 +569,8 @@ function renderStageFormArea(item) {
   targetHelper.textContent = def.helper || "";
   targetForm.innerHTML = renderStageFields(item, def, stored) + `<button class="primary-btn" type="submit">Save ${def.title} and Continue</button>`;
   targetForm.dataset.stage = String(item.stage);
+  targetForm.dataset.draftBound = "";
+  bindDraftAutoSave(targetForm, "stage-form", item.id, item.stage);
 
   let guidanceItems = [
     ["Current Stage", item.workflow_stage, `Selected case: ${item.case_code}`],
@@ -1278,6 +1322,7 @@ function renderAllViews() {
   renderCreditView();
   renderDisbursementView();
   renderLmsView();
+  bindDraftAutoSave(el.leadForm, "lead-form", "new");
 }
 
 async function refreshCaseDetails() {
@@ -1375,6 +1420,7 @@ el.leadForm.addEventListener("submit", async (event) => {
   const created = await api("/api/leads", { method: "POST", body: JSON.stringify(payload) });
   if (showValidationErrors(created) || !created?.id) return;
   state.selectedCaseId = created.id;
+  clearDraft("lead-form", "new");
   el.leadForm.reset();
   setView("pipeline");
   await refreshAll();
@@ -1394,6 +1440,7 @@ el.customerProfileForm.addEventListener("submit", async (event) => {
     body: JSON.stringify(payload)
   });
   if (showValidationErrors(saved)) return;
+  clearDraft("customer-profile", state.selectedCaseId || "new");
   await refreshAll();
   setView("verification");
   activateTab("risk");
@@ -1413,6 +1460,7 @@ async function handleStageFormSubmit(event) {
     await refreshAll();
     return;
   }
+  clearDraft("stage-form", state.selectedCaseId, submittedStage);
   await refreshAll();
   const selected = getSelectedCase();
   if (selected) {
