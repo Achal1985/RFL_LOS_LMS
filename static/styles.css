@@ -12,6 +12,7 @@
 body {
   margin: 0; min-height: 100vh; font-family: "Manrope", sans-serif; color: var(--text);
   font-size: 11px;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at top left, rgba(22, 101, 52, 0.14), transparent 22%),
     radial-gradient(circle at bottom right, rgba(45, 122, 72, 0.12), transparent 18%),
@@ -465,12 +466,13 @@ body {
   0%, 100% { transform: translateY(0px) translateX(0px); }
   50% { transform: translateY(16px) translateX(8px); }
 }
-button, input, select { font: inherit; }
+button, input, select, textarea { font: inherit; }
 button { cursor: pointer; border: none; }
-.app-shell { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+.app-shell { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 100vh; }
 .sidebar {
   padding: 20px 16px; background: linear-gradient(180deg, #102a1b 0%, #18462a 100%); color: #f7fbff;
   display: flex; flex-direction: column; gap: 22px;
+  min-width: 0;
 }
 .brand { display: flex; align-items: center; gap: 14px; }
 .brand-logo-sidebar {
@@ -559,7 +561,7 @@ button { cursor: pointer; border: none; }
 .mini-stat-row, .queue-item, .hero-header, .section-heading, .topbar, .profile-stat, .decision-item, .document-item, .overview-item {
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
 }
-.main-panel { padding: 12px; display: grid; gap: 10px; }
+.main-panel { padding: 12px; display: grid; gap: 10px; min-width: 0; }
 .topbar-actions { display: flex; gap: 10px; }
 .header-business-date {
   display: flex;
@@ -575,7 +577,7 @@ button { cursor: pointer; border: none; }
 .primary-btn { background: linear-gradient(135deg, var(--primary), #2d7a48); color: #fff; box-shadow: 0 18px 35px rgba(22, 101, 52, 0.24); }
 .ghost-btn, .tab, .filter-chip { background: #fff; color: var(--text); border: 1px solid var(--line); }
 .full { width: 100%; }
-.hero-grid, .workspace-grid { display: grid; gap: 12px; }
+.hero-grid, .workspace-grid { display: grid; gap: 12px; min-width: 0; }
 .hero-grid { grid-template-columns: 1.5fr 0.9fr; }
 .workspace-grid { grid-template-columns: 1.45fr 0.9fr; }
 .intake-grid { grid-template-columns: 1.1fr 0.9fr; }
@@ -655,6 +657,7 @@ button { cursor: pointer; border: none; }
 .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.64rem; }
 .schedule-table th, .schedule-table td { padding: 4px 5px; text-align: left; border-bottom: 1px solid var(--line); }
 .charge-grid-wrap { margin-bottom: 12px; overflow-x: auto; }
+.schedule-table-wrap, .table-wrap, .charge-grid-wrap { -webkit-overflow-scrolling: touch; touch-action: pan-x; }
 .charge-grid-table { table-layout: fixed; }
 .charge-grid-table th:nth-child(1), .charge-grid-table td:nth-child(1) { width: 56px; }
 .charge-grid-table th:nth-child(2), .charge-grid-table td:nth-child(2) { width: 58%; min-width: 240px; }
@@ -723,7 +726,7 @@ button { cursor: pointer; border: none; }
 .lms-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 280px minmax(0, 1fr);
 }
 .lms-sidebar {
   padding: 14px;
@@ -732,6 +735,7 @@ button { cursor: pointer; border: none; }
   display: grid;
   align-content: start;
   gap: 14px;
+  min-width: 0;
 }
 .lms-side-card, .lms-side-link {
   border-radius: 18px;
@@ -750,7 +754,7 @@ button { cursor: pointer; border: none; }
 }
 .lms-side-link.active { background: rgba(45, 122, 72, 0.28); border-color: rgba(255, 255, 255, 0.14); }
 .lms-side-actions { display: grid; gap: 8px; }
-.lms-main { padding: 12px; display: grid; gap: 10px; }
+.lms-main { padding: 12px; display: grid; gap: 10px; min-width: 0; }
 .lms-topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .lms-topbar h1 { margin: 3px 0 0; font-size: 1.46rem; }
 .lms-search-shell { padding: 12px; }
@@ -932,6 +936,7 @@ button { cursor: pointer; border: none; }
   display: grid;
   align-content: start;
   gap: 14px;
+  min-width: 0;
 }
 .module-side-card {
   padding: 12px;
@@ -952,6 +957,7 @@ button { cursor: pointer; border: none; }
   align-items: center;
   gap: 12px;
 }
+.module-side-nav { display: grid; gap: 8px; }
 .module-topbar h1 { margin: 4px 0 0; font-size: 1.5rem; }
 .module-view { display: none; }
 .module-view.active { display: block; }
@@ -1067,14 +1073,55 @@ button { cursor: pointer; border: none; }
   border-radius: 8px;
   border: 1px solid var(--line);
 }
+@media (max-width: 1024px) {
+  .app-shell, .lms-shell, .module-shell { grid-template-columns: 1fr; }
+  .sidebar, .lms-sidebar, .module-sidebar {
+    padding: 12px;
+    gap: 12px;
+  }
+  .nav-group, .lms-side-nav, .module-side-nav {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+  .nav-item, .lms-side-link {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .hero-grid,
+  .workspace-grid,
+  .intake-grid,
+  .lms-grid-top,
+  .lms-grid-mid,
+  .lms-grid-bottom,
+  .module-page .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+  .pipeline-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .topbar,
+  .lms-topbar,
+  .module-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .topbar-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .lms-search-grid { grid-template-columns: 1fr; }
+  .module-page .documents-list { grid-template-columns: 1fr 1fr; }
+}
 @media (max-width: 1200px) { .app-shell, .hero-grid, .workspace-grid, .intake-grid { grid-template-columns: 1fr; } .pipeline-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } .lane { max-height: 420px; } }
 @media (max-width: 760px) {
   body { font-size: 10px; }
   .app-shell, .lms-shell, .module-shell { grid-template-columns: 1fr; }
-  .main-panel, .sidebar, .lms-main, .lms-sidebar { padding: 10px; }
-  .metrics-grid, .profile-summary, .risk-grid, .repayment-overview, .lead-form { grid-template-columns: 1fr 1fr; }
-  .topbar, .hero-header, .section-heading { flex-direction: column; align-items: flex-start; }
+  .main-panel, .sidebar, .lms-main, .lms-sidebar, .module-main, .module-sidebar { padding: 10px; }
+  .metrics-grid, .profile-summary, .risk-grid, .repayment-overview, .lead-form { grid-template-columns: 1fr; }
+  .topbar, .hero-header, .section-heading, .lms-topbar, .module-topbar { flex-direction: column; align-items: flex-start; }
   .topbar-actions { width: 100%; flex-direction: column; }
+  .topbar-actions > * { width: 100%; }
   .flow-row { grid-template-columns: 1fr; }
   .login-shell { padding: 8px; overflow: auto; }
   .login-scene { grid-template-columns: 1fr; width: 100%; min-height: auto; max-height: none; gap: 8px; }
@@ -1083,7 +1130,7 @@ button { cursor: pointer; border: none; }
     justify-self: stretch;
     width: 100%;
   }
-  .login-showcase { order: 2; }
+  .login-showcase { display: none; }
   .showcase-primary h2 { font-size: 1.02rem; }
   .showcase-primary {
     min-height: 280px;
@@ -1106,13 +1153,14 @@ button { cursor: pointer; border: none; }
   }
   .login-credential-grid, .login-security-grid, .captcha-row { grid-template-columns: 1fr; }
   .lane { max-height: 360px; }
-  .lms-menu, .lms-form { grid-template-columns: 1fr; }
-  .lms-case-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lms-menu, .lms-form, .lms-batch-grid { grid-template-columns: 1fr; }
+  .lms-case-grid { grid-template-columns: 1fr; }
   .lms-grid-top, .lms-grid-mid, .lms-grid-bottom, .lms-batch-grid { grid-template-columns: 1fr; }
   .module-launch-grid, .module-master-grid, .module-page .documents-list { grid-template-columns: 1fr; }
   .lms-search-grid { grid-template-columns: 1fr; }
   .lms-search-actions, .header-business-date { width: 100%; }
-  .nav-group, .lms-side-nav {
+  .lms-search-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .nav-group, .lms-side-nav, .module-side-nav {
     display: flex;
     gap: 8px;
     overflow-x: auto;
@@ -1123,6 +1171,37 @@ button { cursor: pointer; border: none; }
     white-space: nowrap;
   }
   .sidebar-card, .workspace-card, .hero-card, .board-section, .lms-side-card { border-radius: 16px; }
+  .journey-step {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+  .score-ring-wrap,
+  .hero-header,
+  .section-heading.tight,
+  .document-item,
+  .decision-item,
+  .overview-item,
+  .mini-stat-row,
+  .queue-item {
+    align-items: flex-start;
+  }
+  .score-ring-wrap,
+  .document-item,
+  .decision-item,
+  .overview-item {
+    flex-direction: column;
+  }
+  .case-meta { grid-template-columns: 1fr; }
+  .case-card {
+    flex: 0 0 88%;
+    width: 88%;
+  }
+  .detail-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .signature-pad { height: 120px; }
+  .module-page .workspace-grid { grid-template-columns: 1fr; }
+  .module-page .table-wrap { max-height: 52vh; }
+  .master-table { min-width: 1180px; }
+  .lms-page #lms-action-log { max-height: 320px; }
 }
 @media (max-height: 900px) {
   .login-shell { padding: 8px; }
@@ -1173,6 +1252,7 @@ button { cursor: pointer; border: none; }
     width: 100%;
   }
   .brand-logo-login { max-width: 180px; }
+  .brand-logo-sidebar { max-width: 145px; }
   .login-panel-card { padding: 7px; }
   .login-panel-card .section-heading h3 { font-size: 0.76rem; }
   .login-step-card { padding: 7px; }
@@ -1184,10 +1264,22 @@ button { cursor: pointer; border: none; }
   .pipeline-board { grid-template-columns: 1fr; }
   .topbar-actions { width: 100%; }
   .header-business-date { width: 100%; justify-content: space-between; }
-  .brand-logo-sidebar { max-width: 160px; }
   .topbar h2, .lms-topbar h1 { font-size: 1.2rem; }
   .modal-card { padding: 12px; }
   .master-action-row { flex-direction: column; }
+  .case-card {
+    flex: 0 0 94%;
+    width: 94%;
+  }
+  .lms-search-actions,
+  .master-action-row {
+    grid-template-columns: 1fr;
+  }
+  .detail-tabs { grid-template-columns: 1fr; }
+  .flow-node { font-size: 0.68rem; }
+  .primary-btn, .ghost-btn, .tab { font-size: 0.68rem; }
+  .header-business-date { padding: 6px 8px; }
+  .lms-page #lms-action-log { max-height: 280px; }
 }
 @media (max-width: 560px) {
   .metrics-grid, .profile-summary, .risk-grid, .repayment-overview, .case-meta, .lead-form { grid-template-columns: 1fr; }
