@@ -842,9 +842,7 @@ function renderDashboard() {
   `).join("");
   document.querySelectorAll(".case-card").forEach((button) => {
     button.addEventListener("click", async () => {
-      state.selectedCaseId = button.dataset.id;
-      await refreshCaseDetails();
-      renderAllViews();
+      await focusCaseAndOpenNextAction(button.dataset.id, "pipeline");
     });
   });
   document.querySelectorAll("[data-lane-scroll]").forEach((lane) => {
@@ -1013,10 +1011,7 @@ function renderApplicationsView() {
     </tr>
   `).join("");
   document.querySelectorAll("[data-case-id]").forEach((node) => node.addEventListener("click", async () => {
-    state.selectedCaseId = node.dataset.caseId;
-    await refreshCaseDetails();
-    setView("pipeline");
-    renderAllViews();
+    await focusCaseAndOpenNextAction(node.dataset.caseId, "pipeline");
   }));
 }
 
@@ -1342,6 +1337,14 @@ async function refreshAll() {
   renderAllViews();
 }
 
+async function focusCaseAndOpenNextAction(caseId, fallbackView = "pipeline") {
+  state.selectedCaseId = caseId;
+  await refreshCaseDetails();
+  renderAllViews();
+  setView(fallbackView);
+  openCurrentStep();
+}
+
 async function advanceSelectedCase(targetStage) {
   await api(`/api/cases/${state.selectedCaseId}/advance`, {
     method: "POST",
@@ -1422,8 +1425,8 @@ el.leadForm.addEventListener("submit", async (event) => {
   state.selectedCaseId = created.id;
   clearDraft("lead-form", "new");
   el.leadForm.reset();
-  setView("pipeline");
   await refreshAll();
+  openCurrentStep();
 });
 
 el.customerProfileForm.addEventListener("submit", async (event) => {
@@ -1442,8 +1445,7 @@ el.customerProfileForm.addEventListener("submit", async (event) => {
   if (showValidationErrors(saved)) return;
   clearDraft("customer-profile", state.selectedCaseId || "new");
   await refreshAll();
-  setView("verification");
-  activateTab("risk");
+  openCurrentStep();
 });
 
 async function handleStageFormSubmit(event) {
